@@ -307,7 +307,17 @@ RideFile *CsvFileReader::openRideFile(QFile &file, QStringList &errors) const
                                      rideTime.cap(6).toInt()));
             rideFile->setStartTime(datetime);
         } else {
-            qWarning("Failed to set start time");
+	    //try date format YY-MM-DD.csv
+	    rideTime.setPattern("(\\d\\d)-(\\d\\d)-(\\d\\d).csv$");
+	    if (rideTime.indexIn(file.fileName()) >= 0 ) {
+	        QDateTime datetime(QDate(2000 + rideTime.cap(1).toInt(),
+		                         rideTime.cap(2).toInt(),
+					 rideTime.cap(3).toInt()),
+			           QTime(0, 0));
+		rideFile->setStartTime(datetime);
+	    } else {
+                qWarning("Failed to set start time");
+	    }
         }
     }
 
